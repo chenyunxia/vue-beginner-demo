@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<title>vue demo</title>
+		<style type="text/css">
+			*{box-sizing:border-box;}
+			.box {  
+		        width: 100px;  
+		        height: 100px;  
+		        border: 1px solid red;  
+		        display: inline-block;  
+		    }  
+		  
+		    /*这个定义动画情况，以及存在时的样式，这个样式会覆盖class里的样式*/  
+		    .mytran-transition {  
+		        transition: all 0.3s ease;  
+		        background: #ccc;  
+		    }  
+		  
+		    /* .mytran-enter 定义进入的开始状态 */  
+		    /* .mytran-leave 定义离开的结束状态 */  
+		    .mytran-enter, .mytran-leave {  
+		        height: 0;  
+		        width: 0;  
+		    }
+
+
+		    .machine{
+		    	border: 1px solid red;
+		    	width: 100px;
+		    	padding: 0;
+		    	margin: 0;
+		    }  
+
+		    .machine li{
+		    	height: 40px;
+		    	line-height: 40px;
+		    	border-bottom: 1px solid #ccc;
+		    	list-style: none;
+		    	text-indent: 10px;
+		    }
+
+		    .slide-transition {  
+		        transition: all 1s ease;  
+		        opacity: 1;
+		        /*background-color: greenyellow;*/
+		    }
+		    .slide-enter, .slide-leave {  
+		        /*height: 0;  */
+		        /*width: 0;*/
+		        opacity: 0;
+		    }
+			
+		</style>
+
+	</head>
+	<body>
+
+		<div id="app">
+			{{message}}
+		</div>
+
+		<!-- 双向绑定 -->
+		<div id="app1">
+			<p>{{message}}</p>
+			<input type="text" v-model="message" />
+		</div>
+
+		<!-- 渲染列表 -->
+		<div id="app2">
+			<ul>
+				<li v-for="todo in todos">{{todo.text}}</li>
+			</ul>
+		</div>
+
+		<!-- 处理用户输入 -->
+		<div id="app3">
+			<p>{{message}}</p>
+			<button v-on:click="reverseMessage">点击按钮</button>
+		</div>
+
+		<!-- 综合练习 -->
+		<div id="app4">
+			<p>{{message}}</p>
+			<input type="text" v-model="newTodo" v-on:keyup.enter="addTodo">
+			<ul>
+				<li v-for="todo in todos">
+					<span>{{todo.text}}</span>
+					<button v-on:click="removeTodo($index)">删除</button>
+				</li>
+			</ul>
+		</div>
+
+		<!-- 动画应用 -->
+		<div id="app5">
+			<button @click="change">点击随机隐藏和显示</button>  
+		    <br/>  
+		    <div class="box" v-if="box_1" transition="mytran">1</div>  
+		    <div class="box" v-if="box_2" transition="mytran">2</div>  
+		    <div class="box" v-if="box_3" transition="mytran">3</div>  
+		</div>
+
+		<!-- 动画应用2 -->
+		<div id="app6">
+			<button @click="showContent">点击显示和隐藏列表</button>
+			
+			<ul class="machine" v-if="isShow" transition="slide">
+				<li>路由宝1</li>
+				<li>路由宝2</li>
+				<li>路由宝3</li>
+			</ul>
+		</div>
+	   		
+	   
+
+	    <script src="js/vue.min.js"></script>
+
+	    <script>
+	    	new Vue({
+	    		el: '#app',
+	    		data: {
+	    			message: 'hello, vue.js'
+	    		}
+	    	})
+
+	    	new Vue({
+	    		el: '#app1',
+	    		data: {
+	    			message: 'hello, vue.js'
+	    		}
+	    	})
+
+	    	new Vue({
+	    		el: '#app2',
+	    		data: {
+	    			todos: [{
+	    				text: 'hello,vue1'
+	    			},{
+	    				text: 'hello,vue2'
+	    			},{
+	    				text: 'hello,vue3'
+	    			}]
+	    		}
+	    	})
+
+	    	new Vue({
+	    		el: '#app3',
+	    		data: {
+	    			message: 'hello, vue app3'
+	    		},
+	    		methods: {
+	    			reverseMessage: function(){
+	    				this.message = this.message.split('').reverse().join('');
+	    			}
+	    		}
+	    	})
+
+	    	new Vue({
+	    		el: '#app4',
+	    		data:{
+
+		    		newTodo: '',
+		    		todos: [{
+		    			text: 'some text'
+		    		}]
+	    		},
+	    		methods: {
+	    			addTodo: function(){
+	    				var text = this.newTodo.trim();
+	    				if(text){
+	    					this.todos.push({text: text});
+	    					this.newTodo = '';
+	    				}
+	    			},
+	    			removeTodo: function(index){
+	    				this.todos.splice(index, 1);
+	    			}
+	    		}
+	    	})
+
+	    	new Vue({  
+		        el: '#app5',  
+		        data: {  
+		            box_1: true,  
+		            box_2: true,  
+		            box_3: true  
+		        },  
+		        methods: {  
+		            change: function () {  
+		                for (var i = 1; i < 4; i++) {  
+		                    this['box_' + i] = Math.random() > 0.5 ? true : false;  
+		                }  
+		            }  
+		        }  
+		    })  
+			// setInterval(vm.change, 1000);  
+
+			// 一定要在vue实例前定义，否则就不能生效
+			Vue.transition('slide', {
+			    beforeEnter: function (el) {    
+			        console.log("进入动画");
+			    },
+			    enter: function (el) {
+			        console.log("进入");
+			    },
+			    afterEnter: function (el) {
+			        console.log("进入结束");
+			    },
+			    beforeLeave: function (el) {
+			        console.log("离开动画开始");
+			    },
+			    leave: function (el) {
+			        console.log("离开中");
+			    },
+			    afterLeave: function (el) {
+			        console.log("离开结束");
+			    }
+			})
+			new Vue({
+				el: '#app6',
+				data: {
+					isShow: false
+				},
+				methods: {
+					showContent: function(){
+						if(this.isShow){
+							this.isShow = false;
+						}else{
+							this.isShow = true;
+						}
+					}
+				}
+			})
+	    </script>
+	    
+	</body>
+</html>
